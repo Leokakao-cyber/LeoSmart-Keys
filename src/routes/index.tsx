@@ -618,3 +618,581 @@ function AlphaLayout({
       <BottomRow
         onSwitchSymbols={onSwitchSymbols}
         symbolLabel="?123"
+append={append}
+        onEnter={onEnter}
+        inputType={inputType}
+      />
+    </>
+  );
+}
+
+function SymbolsLayout({
+  append,
+  backspace,
+  onEnter,
+  onBackToAlpha,
+  onSwitchExt,
+  inputType,
+}: {
+  append: (c: string) => void;
+  backspace: () => void;
+  onEnter: () => void;
+  onBackToAlpha: () => void;
+  onSwitchExt: () => void;
+  inputType: InputType;
+}) {
+  return (
+    <>
+      <Row>
+        {SYM_ROW1.map((k) => (
+          <Key key={k} onClick={() => append(k)} label={k} small />
+        ))}
+      </Row>
+      <Row>
+        {SYM_ROW2.map((k) => (
+          <Key key={k} onClick={() => append(k)} label={k} />
+        ))}
+      </Row>
+      <Row>
+        <Key onClick={onSwitchExt} label="=\<" wide alt />
+        {SYM_ROW3.map((k) => (
+          <Key key={k} onClick={() => append(k)} label={k} />
+        ))}
+        <Key onClick={backspace} icon={<Delete className="h-4 w-4" />} wide alt />
+      </Row>
+      <BottomRow
+        onSwitchSymbols={onBackToAlpha}
+        symbolLabel="ABC"
+        append={append}
+        onEnter={onEnter}
+        inputType={inputType}
+      />
+    </>
+  );
+}
+
+function SymbolsExtLayout({
+  append,
+  backspace,
+  onEnter,
+  onBackToAlpha,
+  onBackToSymbols,
+  inputType,
+}: {
+  append: (c: string) => void;
+  backspace: () => void;
+  onEnter: () => void;
+  onBackToAlpha: () => void;
+  onBackToSymbols: () => void;
+  inputType: InputType;
+}) {
+  return (
+    <>
+      <Row>
+        {SYM2_ROW1.map((k) => (
+          <Key key={k} onClick={() => append(k)} label={k} small />
+        ))}
+      </Row>
+      <Row>
+        {SYM2_ROW2.map((k) => (
+          <Key key={k} onClick={() => append(k)} label={k} />
+        ))}
+      </Row>
+      <Row>
+        <Key onClick={onBackToSymbols} label="?123" wide alt />
+        {SYM2_ROW3.map((k) => (
+          <Key key={k} onClick={() => append(k)} label={k} />
+        ))}
+        <Key onClick={backspace} icon={<Delete className="h-4 w-4" />} wide alt />
+      </Row>
+      <Row>
+        {SYM_EXTRAS.map((k) => (
+          <Key key={k} onClick={() => append(k)} label={k} small alt />
+        ))}
+      </Row>
+      <BottomRow
+        onSwitchSymbols={onBackToAlpha}
+        symbolLabel="ABC"
+        append={append}
+        onEnter={onEnter}
+        inputType={inputType}
+      />
+    </>
+  );
+}
+
+function BottomRow({
+  onSwitchSymbols,
+  symbolLabel,
+  append,
+  onEnter,
+  inputType,
+}: {
+  onSwitchSymbols: () => void;
+  symbolLabel: string;
+  append: (c: string) => void;
+  onEnter: () => void;
+  inputType: InputType;
+}) {
+  const enterLabel =
+    inputType === "search"
+      ? "Search"
+      : inputType === "done"
+        ? "Done"
+        : inputType === "next"
+          ? "Next"
+          : "↵";
+  return (
+    <Row>
+      <Key onClick={onSwitchSymbols} label={symbolLabel} small alt />
+      <Key onClick={() => append(",")} label="," small alt />
+      <button
+        onClick={() => append(" ")}
+        className="mx-0.5 h-10 flex-[5] rounded-lg bg-[var(--color-kb-key)] text-[13px] font-medium text-[var(--color-kb-toolbar-fg)] shadow-sm active:scale-[0.98]"
+      >
+        space
+      </button>
+      <Key onClick={() => append(".")} label="." small alt />
+      <button
+        onClick={onEnter}
+        className="mx-0.5 h-10 flex-[1.6] rounded-lg bg-[var(--color-kb-accent)] text-[12px] font-semibold text-[var(--color-kb-accent-fg)] shadow-sm active:scale-[0.98]"
+      >
+        {enterLabel}
+      </button>
+    </Row>
+  );
+}
+
+function EmojiPanel({
+  onPick,
+  onBack,
+}: {
+  onPick: (e: string) => void;
+  onBack: () => void;
+}) {
+  const [cat, setCat] = useState(0);
+  return (
+    <div className="px-2 pt-2">
+      <div className="mb-2 flex items-center gap-1 overflow-x-auto">
+        {EMOJI_CATEGORIES.map((c, i) => (
+          <button
+            key={c.id}
+            onClick={() => setCat(i)}
+            title={c.name}
+            className={`shrink-0 rounded-full px-2 py-1 text-base leading-none ${
+              i === cat
+                ? "bg-[var(--color-kb-accent)] text-[var(--color-kb-accent-fg)]"
+                : "text-[var(--color-kb-toolbar-fg)]"
+            }`}
+          >
+            {c.icon}
+          </button>
+        ))}
+      </div>
+      <div className="mb-1 px-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-kb-toolbar-fg)]">
+        {EMOJI_CATEGORIES[cat].name}
+      </div>
+      <div className="grid max-h-40 grid-cols-8 gap-1 overflow-y-auto">
+        {EMOJI_CATEGORIES[cat].emojis.map((e, i) => (
+          <button
+            key={e + i}
+            onClick={() => onPick(e)}
+            className="grid h-9 place-items-center rounded-lg text-xl active:scale-95"
+          >
+            {e}
+          </button>
+        ))}
+      </div>
+      <div className="mt-2 flex justify-end">
+        <button
+          onClick={onBack}
+          className="rounded-full bg-[var(--color-kb-key-alt)] px-3 py-1 text-[11px] font-medium text-[var(--color-kb-key-fg)]"
+        >
+          ABC
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Toolbar ---------------- */
+
+function Toolbar({
+  onOpenDictionary,
+  onOpenClipboard,
+  onOpenSettings,
+  onOpenFonts,
+  onTranslate,
+  onToggleEmoji,
+  onVoice,
+  emojiActive,
+}: {
+  onOpenDictionary: () => void;
+  onOpenClipboard: () => void;
+  onOpenSettings: () => void;
+  onOpenFonts: () => void;
+  onTranslate: () => void;
+  onToggleEmoji: () => void;
+  onVoice: (t: string) => void;
+  emojiActive: boolean;
+}) {
+  const [listening, setListening] = useState(false);
+  const recRef = useRef<any>(null);
+
+  const startVoice = () => {
+    const SR: any =
+      (typeof window !== "undefined" && (window as any).SpeechRecognition) ||
+      (typeof window !== "undefined" && (window as any).webkitSpeechRecognition);
+    if (!SR) {
+      onVoice("[voice unavailable]");
+      return;
+    }
+    if (listening && recRef.current) {
+      recRef.current.stop();
+      return;
+    }
+    const rec = new SR();
+    rec.lang = "en-US";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = (ev: any) => {
+      const said = ev.results[0][0].transcript;
+      onVoice(said);
+    };
+    rec.onend = () => setListening(false);
+    rec.onerror = () => setListening(false);
+    recRef.current = rec;
+    rec.start();
+    setListening(true);
+  };
+
+  const items = [
+    { icon: AppWindow, label: "Apps", onClick: onOpenSettings },
+    { icon: Type, label: "Format", onClick: onOpenFonts },
+    { icon: BookOpen, label: "Dictionary", primary: true, onClick: onOpenDictionary },
+    { icon: Clipboard, label: "Clipboard", onClick: onOpenClipboard },
+    { icon: Languages, label: "Translate", onClick: onTranslate },
+    { icon: Smile, label: "Emoji", onClick: onToggleEmoji, active: emojiActive },
+    { icon: listening ? Loader2 : Mic, label: "Voice", onClick: startVoice, active: listening },
+  ] as const;
+
+  return (
+    <div className="flex items-center justify-between px-2 pb-2">
+      {items.map((it) => {
+        const Icon = it.icon;
+        const isPrimary = (it as any).primary;
+        const isActive = (it as any).active;
+        return (
+          <button
+            key={it.label}
+            onClick={it.onClick}
+            aria-label={it.label}
+            className={`relative grid h-9 w-9 place-items-center rounded-full transition ${
+              isPrimary
+                ? "bg-[var(--color-kb-accent)] text-[var(--color-kb-accent-fg)] shadow-md shadow-primary/30"
+                : isActive
+                  ? "bg-[var(--color-kb-accent)]/20 text-[var(--color-kb-accent)]"
+                  : "text-[var(--color-kb-toolbar-fg)] hover:bg-black/5 dark:hover:bg-white/5"
+            }`}
+          >
+            <Icon className={`h-[18px] w-[18px] ${it.label === "Voice" && listening ? "animate-spin" : ""}`} />
+            {isPrimary && (
+              <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-[var(--color-kb-bg)]" />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ---------------- Primitives ---------------- */
+
+function Row({ children }: { children: React.ReactNode }) {
+  return <div className="flex px-1 pt-1.5">{children}</div>;
+}
+function Spacer({ w = 1 }: { w?: number }) {
+  return <div style={{ flex: w }} />;
+}
+function Key({
+  label,
+  icon,
+  onClick,
+  wide,
+  small,
+  alt,
+  active,
+}: {
+  label?: string;
+  icon?: React.ReactNode;
+  onClick: () => void;
+  wide?: boolean;
+  small?: boolean;
+  alt?: boolean;
+  active?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`mx-0.5 grid place-items-center rounded-lg shadow-sm transition active:scale-95 ${
+        wide ? "flex-[1.5]" : "flex-1"
+      } ${small ? "h-8 text-[12px]" : "h-10 text-[15px]"} ${
+        alt
+          ? "bg-[var(--color-kb-key-alt)] text-[var(--color-kb-key-fg)]"
+          : "bg-[var(--color-kb-key)] text-[var(--color-kb-key-fg)]"
+      } ${active ? "ring-2 ring-[var(--color-kb-accent)]" : ""}`}
+    >
+      {icon ?? label}
+    </button>
+  );
+}
+
+/* ---------------- Dictionary sheet ---------------- */
+
+type DictEntry = {
+  phonetic: string;
+  pos: string;
+  meaning: string;
+  example: string;
+  source: "api" | "local" | "fallback";
+};
+
+const remoteCache = new Map<string, DictEntry | null>();
+
+async function fetchDefinition(word: string, signal: AbortSignal): Promise<DictEntry | null> {
+  const key = word.toLowerCase().trim();
+  if (!key) return null;
+  if (remoteCache.has(key)) return remoteCache.get(key)!;
+  const res = await fetch(
+    `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(key)}`,
+    { signal },
+  );
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  const first = Array.isArray(data) ? data[0] : null;
+  if (!first) throw new Error("Empty response");
+  const phoneticText =
+    first.phonetic ||
+    (first.phonetics || []).find((p: { text?: string }) => p?.text)?.text ||
+    "";
+  const meaningBlock = (first.meanings || [])[0];
+  const def = meaningBlock?.definitions?.[0];
+  const entry: DictEntry = {
+    phonetic: phoneticText,
+    pos: meaningBlock?.partOfSpeech || "—",
+    meaning: def?.definition || "No definition available.",
+    example: def?.example || "",
+    source: "api",
+  };
+  remoteCache.set(key, entry);
+  return entry;
+}
+
+function DictionarySheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [q, setQ] = useState("serendipity");
+  const [entry, setEntry] = useState<DictEntry | null>(null);
+  const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
+  const suggestions = ["serendipity", "eloquent", "bad", "worry", "happy", "run"];
+
+  // Preload example expansion pack on first open to demo modular loading.
+  useEffect(() => {
+    if (open) trie.loadPack("tech-200", EXPANSION_PACKS["tech-200"]);
+  }, [open]);
+
+  // Debounced lookup: Trie stays snappy; full definitions fetched on demand.
+  useEffect(() => {
+    const key = q.toLowerCase().trim();
+    if (!key) {
+      setEntry(null);
+      setStatus("idle");
+      return;
+    }
+    const local = DICTIONARY[key];
+    const controller = new AbortController();
+    setStatus("loading");
+    const t = setTimeout(async () => {
+      try {
+        const remote = await fetchDefinition(key, controller.signal);
+        if (remote) {
+          setEntry(remote);
+          setStatus("ok");
+          return;
+        }
+        throw new Error("No entry");
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return;
+        if (local) {
+          setEntry({ ...local, source: "local" });
+          setStatus("ok");
+        } else {
+          setEntry({
+            phonetic: "",
+            pos: "—",
+            meaning: `We couldn't reach the dictionary service to fetch "${key}". Check your connection and try again — the word is likely valid, but its full definition is unavailable offline.`,
+            example: "",
+            source: "fallback",
+          });
+          setStatus("error");
+        }
+      }
+    }, 300);
+    return () => {
+      clearTimeout(t);
+      controller.abort();
+    };
+  }, [q]);
+
+  return (
+    <>
+      <div
+        onClick={onClose}
+        className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity ${
+          open ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      />
+      <div
+        className={`fixed inset-x-0 bottom-0 z-50 mx-auto max-w-md rounded-t-3xl border-t bg-card text-card-foreground shadow-2xl transition-transform duration-300 ${
+          open ? "translate-y-0" : "translate-y-full"
+        }`}
+        style={{ maxHeight: "78vh" }}
+      >
+        <div className="flex items-center justify-center pt-3">
+          <div className="h-1 w-10 rounded-full bg-border" />
+        </div>
+        <div className="flex items-center justify-between px-5 pt-3">
+          <div className="flex items-center gap-2">
+            <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary">
+              <BookOpen className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="text-sm font-semibold">Dictionary</div>
+              <div className="text-[11px] text-muted-foreground">
+                Trie-indexed • {trie.size.toLocaleString()} words loaded
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="grid h-8 w-8 place-items-center rounded-full hover:bg-accent"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="px-5 pt-3">
+          <div className="flex items-center gap-2 rounded-2xl border bg-background px-3 py-2">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search any word…"
+              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            />
+            {q && (
+              <button
+                onClick={() => setQ("")}
+                className="text-muted-foreground hover:text-foreground"
+                aria-label="Clear"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+          {/* Live Trie prefix hits */}
+          {q && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {trie.suggest(q, 6).map((w) => (
+                <button
+                  key={w}
+                  onClick={() => setQ(w)}
+                  className="rounded-full border px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-accent"
+                >
+                  {w}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="max-h-[52vh] overflow-y-auto px-5 pb-6 pt-4">
+          {status === "loading" && !entry ? (
+            <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+              Looking up “{q}”…
+            </div>
+          ) : entry ? (
+            <article className="rounded-2xl border bg-background/40 p-4">
+              <div className="flex items-baseline justify-between">
+                <h3 className="text-2xl font-semibold tracking-tight">
+                  {q.trim().toLowerCase()}
+                </h3>
+                <button
+                  onClick={() => speak(q)}
+                  className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-accent"
+                  aria-label="Pronounce"
+                >
+                  <Volume2 className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                {entry.phonetic && (
+                  <span className="text-muted-foreground">{entry.phonetic}</span>
+                )}
+                <span className="rounded-full bg-accent px-2 py-0.5 font-medium text-accent-foreground">
+                  {entry.pos}
+                </span>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                    entry.source === "api"
+                      ? "bg-primary/10 text-primary"
+                      : entry.source === "local"
+                        ? "bg-accent text-accent-foreground"
+                        : "bg-destructive/10 text-destructive"
+                  }`}
+                >
+                  {entry.source === "api"
+                    ? "Live"
+                    : entry.source === "local"
+                      ? "Offline cache"
+                      : "Offline"}
+                </span>
+                {status === "loading" && (
+                  <span className="text-muted-foreground">refreshing…</span>
+                )}
+              </div>
+              <p className="mt-4 text-sm leading-relaxed">{entry.meaning}</p>
+              {entry.example && (
+                <div className="mt-4 rounded-xl border border-dashed p-3 text-xs italic text-muted-foreground">
+                  "{entry.example}"
+                </div>
+              )}
+            </article>
+          ) : (
+            <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+              Type a word to look it up.
+            </div>
+          )}
+
+          <div className="mt-5">
+            <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Try
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {suggestions.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setQ(s)}
+                  className={`rounded-full border px-3 py-1 text-xs transition ${
+                    q === s ? "border-primary bg-primary/10 text-primary" : "hover:bg-accent"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
